@@ -1,0 +1,1111 @@
+Yes. And because you’ve already been working with **12/24 V batteries, an MPPT controller, an inverter, and RV loads**, I’d build this as a practical **RV off-grid electrical manual** rather than a generic solar tutorial.
+
+One important point first: **don’t wire the system from a generic diagram without checking the exact voltage/current ratings printed on your panels, batteries, MPPT, inverter, and RV.** A 2,000 W inverter on 12 V can pull roughly **167 A**, while the same inverter on 24 V is roughly **83 A** before losses. That difference is enormous for cable and fuse sizing. ([Solar RV Panels][1])
+
+Also, solar/battery wiring can start fires or cause severe burns/arc faults. If you're uncertain about a high-current connection, have an RV electrician inspect it before energizing it.
+
+# RV OFF-GRID SOLAR SYSTEM — COMPLETE HOOKUP GUIDE
+
+## 1. The basic architecture
+
+Think of the system as **four separate electrical sections**:
+
+```text
+                  SOLAR ARRAY
+              ┌─────┬─────┬─────┐
+              │     │     │     │
+            PANEL PANEL PANEL PANEL
+              └─────┴─────┴─────┘
+                       │
+                  PV DISCONNECT
+                       │
+                  PV FUSE/BREAKER
+                       │
+                       ▼
+                ┌──────────────┐
+                │ MPPT CHARGE   │
+                │  CONTROLLER   │
+                └──────────────┘
+                   │        │
+              +    │        │    -
+              │    │        │
+           DC FUSE │        │
+              │    │        │
+              ▼    ▼        ▼
+        ┌────────────────────────┐
+        │      BATTERY BANK      │
+        │                        │
+        │  + ─────────────── -   │
+        └────────────────────────┘
+              │
+          MAIN FUSE
+              │
+          DISCONNECT
+              │
+              ▼
+        ┌──────────────┐
+        │   INVERTER   │
+        │  12/24→120V  │
+        └──────────────┘
+              │
+              ▼
+        RV AC LOADS
+```
+
+And separately:
+
+```text
+BATTERY BANK
+     │
+     ▼
+DC FUSE PANEL
+     │
+     ├── RV lights
+     ├── water pump
+     ├── refrigerator controls
+     ├── USB/12V outlets
+     ├── fans
+     └── other 12V loads
+```
+
+That separation is important. Your **inverter should not be the source for every little 12 V load**. Small DC loads should come through a properly fused DC distribution panel. Victron's current RV guidance similarly recommends busbars and a fused DC distribution system for loads such as lights, pumps and refrigerators. ([Victron Energy][2])
+
+---
+
+# 2. THE COMPONENTS YOU NEED
+
+## Solar side
+
+You need:
+
+* Solar panels
+* MC4-compatible PV cable
+* MC4 connectors
+* PV disconnect/breaker
+* PV fuse(s), when required by the array configuration
+* MPPT charge controller
+
+The panels **must not be connected directly to the batteries**. The MPPT sits between them and converts the panel voltage into the appropriate battery charging voltage. ([Victron Energy][3])
+
+---
+
+# 3. Charge controller
+
+For an RV, I'd strongly favor:
+
+### MPPT
+
+over a basic PWM controller.
+
+The controller has two completely different sides:
+
+```text
+PV INPUT                 BATTERY OUTPUT
+
+PV + ────────┐       ┌──────── + Battery
+             │       │
+             ▼       ▼
+          ┌─────────────┐
+          │    MPPT     │
+          │ CONTROLLER  │
+          └─────────────┘
+             ▲       ▲
+             │       │
+PV - ────────┘       └──────── - Battery
+```
+
+The **PV voltage** and **battery voltage** do not have to be the same.
+
+That's one of the biggest advantages of MPPT.
+
+For example:
+
+```text
+Solar array:
+80 V
+10 A
+
+MPPT
+
+Battery:
+14 V
+~50 A
+```
+
+The controller converts the higher PV voltage into lower battery voltage/higher current.
+
+---
+
+# 4. PANEL WIRING
+
+There are two fundamental ways to connect panels.
+
+## Parallel
+
+```text
+Panel 1 + ─────┐
+Panel 2 + ─────┼──── + PV
+Panel 3 + ─────┤
+Panel 4 + ─────┘
+
+Panel 1 - ─────┐
+Panel 2 - ─────┼──── - PV
+Panel 3 - ─────┤
+Panel 4 - ─────┘
+```
+
+Voltage stays approximately the same.
+
+Current adds.
+
+### Advantages
+
+* Better with partial shading
+* Lower PV voltage
+* Potentially easier compatibility with some controllers
+
+### Disadvantage
+
+More current means larger PV wiring.
+
+---
+
+# 5. Series panels
+
+```text
+Panel 1 + ─── Panel 2 -
+Panel 2 + ─── Panel 3 -
+Panel 3 + ─── Panel 4 -
+```
+
+The voltages add.
+
+Current stays approximately the same.
+
+For example, four panels each having:
+
+**Vmp = 20 V**
+
+could produce approximately:
+
+**80 Vmp**
+
+in series.
+
+That's particularly useful when the MPPT is designed for higher PV voltage.
+
+### BUT:
+
+You must calculate the **cold-weather Voc** of the array.
+
+Do not simply add the panel labels and assume you're safe.
+
+The maximum PV voltage of the controller must be greater than the array's **worst-case cold Voc**.
+
+---
+
+# 6. YOUR MPPT HAS A HARD LIMIT
+
+Suppose your controller says:
+
+```text
+150 V maximum PV
+60 A maximum output
+```
+
+Your solar array has to remain below:
+
+**150 V maximum PV input**
+
+under the manufacturer's specified conditions.
+
+And the controller can't exceed:
+
+**60 A charging output.**
+
+Don't design right on the edge if you don't have to.
+
+---
+
+# 7. PANEL → MPPT PROTECTION
+
+A typical arrangement is:
+
+```text
+PANELS
+  │
+  ▼
+PV COMBINER
+  │
+  ├── String fuse
+  │
+  ▼
+PV DISCONNECT
+  │
+  ▼
+MPPT
+```
+
+If you have multiple parallel strings, individual string protection may be required.
+
+Fuse sizing depends on the panel/string **Isc** and the applicable equipment/manufacturer requirements. Don't blindly install a 20 A fuse because you saw it in another RV. ([Solar RV Panels][1])
+
+---
+
+# 8. MPPT → BATTERY
+
+This is one of the most important wires in the system.
+
+Example:
+
+```text
+MPPT + 
+   │
+   │
+ [FUSE]
+   │
+   ▼
+BATTERY +
+```
+
+Negative:
+
+```text
+MPPT -
+   │
+   ▼
+NEGATIVE BUSBAR
+   │
+   ▼
+BATTERY -
+```
+
+The controller-to-battery cable needs to handle the controller's **maximum output current**.
+
+For example:
+
+### 40 A MPPT
+
+You might have:
+
+```text
+40 A controller
+↓
+appropriately sized cable
+↓
+50 A fuse/breaker
+↓
+battery
+```
+
+But the actual wire size must be calculated from **current + one-way length + allowable voltage drop + cable insulation/temperature rating**, not simply copied from this example.
+
+The fuse protects the wiring from a fault; it isn't merely there to protect the controller. ([Smart RV Hub][4])
+
+---
+
+# 9. BATTERY BANK
+
+This is where your previous 12/24 V setup becomes extremely important.
+
+You can configure batteries as:
+
+### Parallel
+
+```text
+12V 100Ah
+   │
+   ├─────────┐
+   │         │
+12V 100Ah   │
+   │         │
+   └─────────┘
+
+= 12V 200Ah
+```
+
+Or:
+
+### Series
+
+```text
+12V 100Ah
+   +
+   │
+   │
+   -
+12V 100Ah
+
+= 24V 100Ah
+```
+
+Four 12 V batteries in series:
+
+```text
+12V + 12V + 12V + 12V
+
+= 48V
+```
+
+Four in a 2S2P arrangement:
+
+```text
+12V + 12V
+     │
+     │
+12V + 12V
+
+= 24V with twice the Ah of one string
+```
+
+**Every battery must be appropriate for series/parallel operation according to its manufacturer.**
+
+Don't mix:
+
+* old and new batteries
+* different chemistries
+* substantially different capacities
+* batteries with different states of health
+
+unless the manufacturer specifically permits it.
+
+---
+
+# 10. BATTERY BALANCING
+
+If you're running multiple batteries in parallel, don't just do:
+
+```text
+Battery 1 → Battery 2 → Battery 3 → Battery 4
+```
+
+and expect perfect current sharing.
+
+A better approach is a properly designed busbar arrangement.
+
+For example:
+
+```text
+          + BUSBAR
+          │
+    ┌─────┼─────┬─────┐
+    │     │     │     │
+   B1    B2    B3    B4
+    │     │     │     │
+    └─────┼─────┴─────┘
+          │
+       - BUSBAR
+```
+
+Victron specifically recommends organized busbar/distribution arrangements for battery systems. ([Victron Energy][2])
+
+---
+
+# 11. MAIN BATTERY FUSE
+
+This is **not optional**.
+
+The inverter can potentially pull hundreds of amps.
+
+Your main arrangement should look like:
+
+```text
+BATTERY +
+    │
+    │ VERY SHORT
+    ▼
+[MAIN FUSE]
+    │
+    ▼
+[MASTER DISCONNECT]
+    │
+    ▼
++ BUSBAR
+```
+
+Then:
+
+```text
++ BUSBAR
+   │
+   ├──────────── MPPT
+   │
+   ├──────────── DC FUSE PANEL
+   │
+   └──────────── INVERTER
+```
+
+The main fuse should be installed close to the battery positive terminal.
+
+For high-current inverter circuits, appropriate high-interrupt-capacity fuses such as Class T or appropriately rated ANL/MRBF systems may be used depending on the installation. ([Solar RV Panels][1])
+
+---
+
+# 12. INVERTER
+
+This is where the system gets dangerous because the current becomes enormous.
+
+Suppose:
+
+### 2,000 W inverter
+
+At 12 V:
+
+**2,000 ÷ 12 ≈ 167 A**
+
+At 24 V:
+
+**2,000 ÷ 24 ≈ 83 A**
+
+And that's before inverter losses.
+
+So:
+
+### 12 V system
+
+requires extremely heavy battery cabling.
+
+### 24 V system
+
+cuts the current roughly in half.
+
+That's why I would seriously consider **24 V for a larger RV solar system**, assuming your RV's existing DC equipment and inverter architecture are compatible.
+
+---
+
+# 13. INVERTER CONNECTION
+
+```text
+BATTERY +
+
+     │
+     ▼
+ [MAIN FUSE]
+     │
+     ▼
+ [DISCONNECT]
+     │
+     ▼
+ + BUSBAR
+     │
+     │
+     ▼
+ INVERTER +
+ 
+BATTERY -
+     │
+     ▼
+ NEGATIVE BUSBAR
+     │
+     ▼
+ INVERTER -
+```
+
+Keep the battery-to-inverter cables:
+
+**short**
+
+**large enough**
+
+**properly crimped**
+
+**properly supported**
+
+**protected from abrasion**
+
+A loose high-current connection can generate extreme heat.
+
+Victron specifically warns that battery connections must be secure and that improper wiring can result in fire, equipment damage or injury. ([Victron Energy][5])
+
+---
+
+# 14. DC RV LOADS
+
+Your RV probably already has a 12 V DC distribution system.
+
+Things such as:
+
+* lights
+* water pump
+* furnace controls
+* refrigerator controls
+* fans
+* USB outlets
+* propane appliances' electronics
+* control boards
+
+can remain on the DC side.
+
+Conceptually:
+
+```text
+BATTERY
+   │
+   ▼
++ BUSBAR
+   │
+   ▼
+[MAIN DC FUSE]
+   │
+   ▼
+DC FUSE PANEL
+   │
+   ├── 5A → lights
+   ├── 10A → USB
+   ├── 15A → pump
+   ├── 15A → refrigerator
+   ├── etc.
+```
+
+**Do not randomly replace the RV's existing fuses with larger fuses.**
+
+The fuse protects the circuit wiring.
+
+---
+
+# 15. AC SIDE
+
+Your inverter produces:
+
+```text
+12/24 V DC
+       ↓
+   INVERTER
+       ↓
+    120 V AC
+```
+
+That AC output should go into a properly designed AC distribution system.
+
+For a permanent RV installation:
+
+```text
+INVERTER
+   │
+   ▼
+AC BREAKER/DISCONNECT
+   │
+   ▼
+RV AC PANEL
+   │
+   ├── outlets
+   ├── TV
+   ├── computer
+   ├── refrigerator
+   └── other loads
+```
+
+The neutral/ground arrangement is **inverter-specific**. Some inverters switch/bond neutral internally; others don't.
+
+**Do not randomly bond neutral to ground.**
+
+That is one of the areas where you should follow the exact inverter manual and RV electrical configuration.
+
+Victron's RV guidance emphasizes proper grounding of the inverter, AC distribution and DC system. ([Victron Energy][2])
+
+---
+
+# 16. SHORE POWER
+
+If your RV already has shore power:
+
+```text
+          SHORE POWER
+               │
+               ▼
+         RV AC PANEL
+               │
+               ├──── RV loads
+               │
+               ▼
+       INVERTER/CHARGER
+               │
+               ▼
+          BATTERY BANK
+```
+
+If you're using a simple inverter rather than an inverter/charger, **don't simply plug the RV's shore-power cord into an outlet powered by the inverter without a properly engineered transfer arrangement.**
+
+Otherwise you can create dangerous backfeeding.
+
+Use a proper transfer switch or an inverter designed for the intended RV configuration.
+
+---
+
+# 17. SOLAR + SHORE + ALTERNATOR
+
+A really good RV off-grid system can have **three charging sources**:
+
+```text
+                 SOLAR
+                   │
+                   ▼
+                MPPT
+                   │
+                   │
+ALTERNATOR → DC-DC CHARGER → BATTERY
+                   │
+                   │
+SHORE → RV CHARGER ─┘
+                   │
+                   ▼
+              BATTERY BANK
+                   │
+                   ▼
+                INVERTER
+```
+
+That is much more resilient than trying to make solar do everything.
+
+You can drive:
+
+**engine alternator → DC-DC charger → batteries**
+
+while driving.
+
+Then:
+
+**solar → MPPT → batteries**
+
+when parked.
+
+Then:
+
+**shore power → charger → batteries**
+
+when you have access to electricity.
+
+---
+
+# 18. FUSES — THE SIMPLE RULE
+
+Think about every source of energy.
+
+### Solar
+
+```text
+PV array
+ ↓
+PV protection
+ ↓
+MPPT
+```
+
+### MPPT
+
+```text
+MPPT
+ ↓
+battery-side fuse/breaker
+ ↓
+battery
+```
+
+### Battery → inverter
+
+```text
+battery
+ ↓
+HIGH CURRENT FUSE
+ ↓
+disconnect
+ ↓
+inverter
+```
+
+### DC loads
+
+```text
+battery
+ ↓
+DC fuse panel
+ ↓
+individual fuses
+ ↓
+loads
+```
+
+The fuse is fundamentally there to prevent a wiring fault from turning the cable into a heating element. ([Smart RV Hub][4])
+
+---
+
+# 19. WIRE SIZE
+
+Don't memorize one wire gauge.
+
+Calculate it.
+
+You need:
+
+**current**
+
+*
+
+**one-way cable length**
+
+*
+
+**allowable voltage drop**
+
+*
+
+**temperature/installation conditions**
+
+For example, a 200 A inverter circuit and a 20 A solar circuit are completely different.
+
+### Typical conceptual hierarchy:
+
+```text
+SOLAR PV
+10–12 AWG-ish
+        ↓
+MPPT → BATTERY
+6 AWG-ish for some moderate systems
+        ↓
+BATTERY → INVERTER
+2/0, 4/0 or other very large cable
+depending on voltage/current/run
+```
+
+Those are **examples, not a prescription**. Actual sizing must be calculated for your equipment.
+
+The battery-to-inverter connection is normally the largest cable in the system because it carries the greatest current. ([Solar RV Panels][1])
+
+---
+
+# 20. CONNECTION ORDER
+
+This is important.
+
+Different manufacturers can specify different procedures, so **your controller manual wins**.
+
+For many MPPT controllers, a common startup sequence is:
+
+### CONNECT
+
+```text
+1. Battery
+       ↓
+2. MPPT battery connection
+       ↓
+3. PV
+       ↓
+4. Inverter
+       ↓
+5. Loads
+```
+
+For example, Victron's equipment is designed to have the battery connected so the controller can detect the battery voltage before PV is applied. ([Victron Energy][6])
+
+### DISCONNECT
+
+Generally:
+
+```text
+1. PV
+2. Inverter/loads
+3. Battery
+```
+
+But again:
+
+**follow your specific controller manufacturer's sequence.**
+
+---
+
+# 21. NEVER DO THESE
+
+### ❌ Panel → battery directly
+
+No.
+
+```text
+PANEL ─────── BATTERY
+```
+
+Don't do this. A proper solar charge controller belongs between them. ([Victron Energy][3])
+
+### ❌ Battery → inverter without fuse
+
+No.
+
+### ❌ Tiny wire on a 2,000 W inverter
+
+Absolutely not.
+
+### ❌ Fuse bigger than the wire can safely carry
+
+No.
+
+### ❌ Mix 12 V and 24 V equipment accidentally
+
+Very bad.
+
+### ❌ Connect batteries with reversed polarity
+
+Potentially catastrophic.
+
+### ❌ Use automotive AC extension cords for permanent inverter wiring
+
+No.
+
+### ❌ Backfeed campground/RV shore power
+
+Extremely dangerous.
+
+### ❌ Work on exposed PV connectors in full sun
+
+PV panels produce power whenever illuminated.
+
+### ❌ Put batteries in an unventilated/unsafe compartment
+
+Battery chemistry determines ventilation and installation requirements.
+
+---
+
+# 22. THE SYSTEM I WOULD BUILD FOR YOUR RV
+
+Given your previous setup, I'd aim toward:
+
+```text
+                 SOLAR ARRAY
+               ~400–800+ W
+                     │
+                     ▼
+              PV DISCONNECT
+                     │
+                     ▼
+                MPPT CONTROLLER
+                     │
+                     │
+                24 V BATTERY
+                  BANK
+                     │
+              ┌──────┴──────┐
+              │             │
+          DC FUSE       INVERTER
+            PANEL           │
+              │             │
+       RV 12V loads      120V AC
+                            │
+                      AC LOAD PANEL
+```
+
+And optionally:
+
+```text
+ENGINE
+  │
+  ▼
+DC-DC CHARGER
+  │
+  ▼
+24V BATTERY BANK
+```
+
+That gives you:
+
+**solar + alternator + battery + inverter + RV DC system.**
+
+---
+
+# 23. YOUR OFF-GRID DAILY LOOP
+
+For your particular road setup:
+
+### Morning
+
+Solar begins charging.
+
+```text
+SUN
+ ↓
+PANELS
+ ↓
+MPPT
+ ↓
+BATTERY
+```
+
+### During the day
+
+Solar powers your loads while replenishing the battery.
+
+```text
+SOLAR
+ ↓
+MPPT
+ ↓
+BATTERY
+ ↓
+LOADS
+```
+
+### Evening
+
+```text
+BATTERY
+ ↓
+INVERTER
+ ↓
+COMPUTER
+TV
+ROUTER
+OTHER AC LOADS
+```
+
+### Overnight
+
+Try to keep the inverter off for things that don't need 120 V.
+
+Run:
+
+```text
+12V lights
+12V fans
+12V USB
+12V refrigerator electronics
+```
+
+directly from the DC system where appropriate.
+
+That avoids wasting energy converting:
+
+**DC → AC → DC**
+
+---
+
+# 24. YOUR BIGGEST POWER RULE
+
+For your remote-work RV:
+
+**Don't run everything through the inverter.**
+
+For example:
+
+### Bad
+
+```text
+Battery
+ ↓
+Inverter
+ ↓
+120V power supply
+ ↓
+USB charger
+ ↓
+Phone
+```
+
+Better:
+
+```text
+Battery
+ ↓
+12V USB
+ ↓
+Phone
+```
+
+Every conversion costs energy.
+
+---
+
+# 25. MONITORING
+
+I'd also install:
+
+### Battery monitor / shunt
+
+Something like a proper DC shunt goes on the **battery negative path** so you can measure:
+
+* voltage
+* current
+* amp-hours
+* charging
+* discharging
+* state of charge
+
+Then your system becomes something you can actually manage instead of guessing.
+
+You want to know:
+
+```text
+Battery: 78%
+Solar: +32A
+RV DC: -8A
+Inverter: -42A
+Net: -18A
+```
+
+rather than staring at a battery voltage and guessing.
+
+---
+
+# 26. THE FINAL PHYSICAL LAYOUT
+
+I'd arrange your electrical compartment approximately like this:
+
+```text
+             ROOF
+        ┌───────────────┐
+        │ SOLAR PANELS  │
+        └───────┬───────┘
+                │
+             PV CABLE
+                │
+                ▼
+        ┌───────────────┐
+        │ PV DISCONNECT │
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │     MPPT      │
+        └───────┬───────┘
+                │
+             DC FUSE
+                │
+                ▼
+       ┌─────────────────┐
+       │  + BUSBAR       │
+       │  - BUSBAR       │
+       └───┬─────┬───┬───┘
+           │     │   │
+           │     │   └──── DC FUSE PANEL
+           │     │
+           │     └──────── INVERTER
+           │
+       BATTERY BANK
+           │
+        MAIN FUSE
+           │
+       DISCONNECT
+```
+
+Keep high-current cables **short** and route/protect them so they cannot rub against metal edges.
+
+---
+
+# 27. THE MOST IMPORTANT THING FOR YOUR CURRENT RV
+
+Because you've previously had **a fuse melt/pop while running things like a mini-fridge, TV and evaporative cooler**, I would **not simply add another larger fuse**.
+
+A melted fuse holder is a warning that something upstream needs investigation:
+
+**overcurrent, undersized wire, poor crimp/connection, inadequate fuse holder, excessive heat, or a combination of these.**
+
+A larger fuse can make the situation worse because the wiring may be the part that's overheating.
+
+For your actual RV, I'd want to calculate the system from the ground up rather than guessing.
+
+If you upload **photos of your current batteries, solar panels' labels, MPPT label, inverter label, existing fuses/wiring, and the RV's electrical compartment**, I can turn this into a **specific wiring diagram for your exact system**—including which batteries go in series/parallel, where each fuse goes, approximate cable sizes, and a startup/shutdown checklist.
+
+A clear photo of each component's **label/spec plate** is especially useful; don't include any personal information or account numbers.
+
+[1]: https://solarrvpanels.com/blog/rv-solar-wiring-guide.html?utm_source=chatgpt.com "RV Solar Wiring Guide: Wire Gauge, Fuses & Safety | SolarRVPanels"
+[2]: https://www.victronenergy.com/knowledge-articles/2026/9/3/rv-electrical-system-components?utm_source=chatgpt.com "Understanding the Components of Your RV Electrical System | Victron Energy"
+[3]: https://www.victronenergy.com/media/pg/The_Wiring_Unlimited_book/en/dc-wiring.html?utm_source=chatgpt.com "4. DC wiring"
+[4]: https://smartrvhub.com/guides/rv-solar-wiring-guide?utm_source=chatgpt.com "RV Solar Wiring Guide: Diagram, Fuses & Wire Sizing (2026)"
+[5]: https://www.victronenergy.com/media/pg/Sun_Inverter/en/installation.html?utm_source=chatgpt.com "3. Installation"
+[6]: https://www.victronenergy.com/blog/2019/9/3/wiring-unlimited/?utm_source=chatgpt.com "Wiring Unlimited - Victron Energy"
